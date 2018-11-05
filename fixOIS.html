@@ -1,0 +1,106 @@
+   <head>
+      <script type="application/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js">
+      </script>
+	<title>fixOIS in gCam</title>
+   </head>
+   
+<script type="application/javascript">
+	$( document ).ready(function() {
+		
+		
+var shablon = `
+.method public final a(I)Liia;
+    .locals 4
+
+    :goto_0
+    :try_start_0
+    iget-object v1, p0, Lifa;->a:Landroid/hardware/camera2/CameraDevice;
+
+    new-instance v0, Liia;
+
+    invoke-virtual {v1, p1}, Landroid/hardware/camera2/CameraDevice;->createCaptureRequest(I)Landroid/hardware/camera2/CaptureRequest$Builder;
+
+    move-result-object v1
+
+    invoke-direct {v0, v1}, Liia;-><init>(Landroid/hardware/camera2/CaptureRequest$Builder;)V
+
+    sget-object v3, Landroid/hardware/camera2/CaptureRequest;->LENS_OPTICAL_STABILIZATION_MODE:Landroid/hardware/camera2/CaptureRequest$Key;
+
+    const/4 v1, 0x1
+
+    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+
+    move-result-object v2
+
+    invoke-virtual {v0, v3, v2}, Liia;->a(Landroid/hardware/camera2/CaptureRequest$Key;Ljava/lang/Object;)V
+    :try_end_0
+    .catch Ljava/lang/RuntimeException; {:try_start_0 .. :try_end_0} :catch_0
+    .catch Ljava/lang/IllegalStateException; {:try_start_0 .. :try_end_0} :catch_0
+    .catch Landroid/hardware/camera2/CameraAccessException; {:try_start_0 .. :try_end_0} :catch_0
+    .catch Ljava/lang/SecurityException; {:try_start_0 .. :try_end_0} :catch_0
+
+    return-object v0
+
+    :catch_0
+    move-exception v0
+
+    if-gtz p1, :cond_0
+
+    move v0, p1
+
+    add-int/lit8 v0, v0, 0x1
+
+    move p1, v0
+
+    goto :goto_0
+
+    :cond_0
+    move v0, p1
+
+    add-int/lit8 v0, v0, -0x1
+
+    move p1, v0
+
+    goto :goto_0
+.end method`;
+
+		$('#buttonFix').click(function() {
+			allText = $('#smaliCode').val();
+			
+			//alert(allText);
+		
+			var myRe = /\.method public final(((?!method)(.|\n))*?)Landroid\/hardware\/camera2\/CameraDevice;->createCaptureRequest\(I\)Landroid\/hardware\/camera2\/CaptureRequest\$Builder\;((.|\n)*?)\.end method/ig;
+			var myArray = myRe.exec(allText);
+			//alert(myArray[0]);
+			
+			original = myArray[0];
+			
+			var myRe2 = /\.method public final a\(I\)(.+?);/gm;
+			var myArray2 = myRe2.exec(original);
+
+			var firstVar = myArray2[1];
+			
+			var myRe3 = /iget-object v1, p0, (.+?);/gm;
+			var myArray3 = myRe3.exec(original);
+
+			var secondVar = myArray3[1];
+			
+			//alert(firstVar);
+			//alert(secondVar);
+			
+			shablon = shablon.replace(/Liia/g, firstVar);
+			shablon = shablon.replace(/Lifa/g, secondVar);
+			
+			var newCode = allText.replace(original, shablon);
+			
+			if(allText != newCode){alert('Done!');}
+			
+			$('#smaliCode').val(newCode);
+		});
+		
+	});
+	
+</script>   
+   
+<textarea id=smaliCode style='width:50%; height:50%;'></textarea><br><br>
+<button id=buttonFix>FIX</button>
